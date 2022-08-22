@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model GuildData {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  qotds           Qotd[]
+  qotdNumber      Int            @default(1)
+  guildId         String         @unique
+  channelId       String
+  EmbedSettings   EmbedSettings?
+  embedSettingsId String?        @unique @db.ObjectId
+}
+
+model Qotd {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  author      String
+  description String
+  GuildData   GuildData? @relation(fields: [guildDataId], references: [id])
+  guildDataId String?    @db.ObjectId
+}
+
+model EmbedSettings {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  color       String    @default("#69d8fa")
+  footer      String    @default("Qotd Bot")
+  title       String    @default("Qotd #{number}")
+  GuildData   GuildData @relation(fields: [guildDataId], references: [id])
+  guildDataId String    @unique @db.ObjectId
+}
